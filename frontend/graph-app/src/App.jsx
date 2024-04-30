@@ -4,7 +4,7 @@ import { Input } from "./Input";
 import { useState } from "react";
 
 function App() {
-  const [submitData, setSubmit] = useState({});
+  const [submitData, setSubmit] = useState({ username: "", personalToken: "" });
   return (
     <>
       <Input setSubmit={setSubmit} />

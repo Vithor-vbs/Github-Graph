@@ -10,7 +10,6 @@ async function fetchRepoLanguages(username, repo, personalToken) {
     });
     if (response.status === 200) {
       const languages = response.data;
-      // Extract language names (keys) from the languages object
       const languageNames = Object.keys(languages);
       return languageNames;
     } else {
@@ -33,7 +32,6 @@ async function fetchRepoContributors(username, repo, personalToken) {
     });
     if (response.status === 200) {
       const contributors = response.data;
-      // Extract logins from contributors array
       const logins = contributors.map((contributor) => contributor.login);
       return logins;
     } else {

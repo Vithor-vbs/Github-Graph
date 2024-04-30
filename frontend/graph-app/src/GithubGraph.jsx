@@ -65,10 +65,8 @@ const GithubRepoGraph = ({ submitData }) => {
   }, [submitData]);
 
   useEffect(() => {
-    // Generate graph data whenever reposData changes
     const graphData = generateGraphData(reposData);
 
-    // Update chart data
     const chart = Highcharts.chart("container", {
       chart: {
         type: "networkgraph",
@@ -117,15 +115,12 @@ const GithubRepoGraph = ({ submitData }) => {
     return () => {
       chart.destroy();
     };
-  }, [reposData]); // Update graph when reposData changes
+  }, [reposData]);
 
-  // Define a function to generate the node and link data for the graph
-  // Define a function to generate the node and link data for the graph
   const generateGraphData = (reposData) => {
     const nodes = {};
     const links = [];
 
-    // Add central node representing the GitHub user
     nodes[username] = {
       id: username,
       name: username,
@@ -149,9 +144,7 @@ const GithubRepoGraph = ({ submitData }) => {
       // Create link between GitHub user and repository
       links.push([username, repo.name]);
 
-      // Iterate through languages of the repository
       repo.languages.forEach((language) => {
-        // Add language as a node if not already added
         if (!nodes[language]) {
           nodes[language] = {
             id: language,
@@ -166,9 +159,7 @@ const GithubRepoGraph = ({ submitData }) => {
         links.push([repo.name, language]);
       });
 
-      // Iterate through contributors of the repository
       repo.contributors.forEach((contributor) => {
-        // Add contributor as a node if not already added
         if (!nodes[contributor]) {
           nodes[contributor] = {
             id: contributor,
@@ -185,7 +176,7 @@ const GithubRepoGraph = ({ submitData }) => {
     });
 
     return {
-      nodes: Object.values(nodes), // Convert nodes object to array
+      nodes: Object.values(nodes),
       links: links,
     };
   };
