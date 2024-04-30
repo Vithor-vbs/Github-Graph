@@ -11,39 +11,36 @@ export const Input = ({ setSubmit }) => {
   };
 
   return (
-    <div className="general-container">
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <div>
-            <label htmlFor="username" className="input-label">
-              GitHub Username:
-            </label>
+    <div className="container-centering">
+      <div className="login-box">
+        <form>
+          <div className="user-box">
             <input
               type="text"
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="input-field"
               required
-            />
+            />{" "}
+            <label>Username</label>
           </div>
-          <div>
-            <label htmlFor="token" className="input-label">
-              Personal Access Token:
-            </label>
+          <div className="user-box">
             <input
               type="password"
               id="token"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              className="input-field"
-            />
+            />{" "}
+            <label>Personal Token</label>
           </div>
-        </div>
-        <button type="submit" className="submit-button">
-          Submit
-        </button>
-      </form>
+          <center>
+            <a onClick={handleSubmit} className="submit-button">
+              Submit
+              <span></span>
+            </a>
+          </center>
+        </form>
+      </div>
     </div>
   );
 };

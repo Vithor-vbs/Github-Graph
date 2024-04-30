@@ -1,44 +1,106 @@
-.input-container {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 10rem;
+.login-box {
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  padding: 40px;
+  background: #fff;
+  box-sizing: border-box;
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.6); */
+
+  border-radius: 10px;
+  margin-bottom: 30px;
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.input-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+.login-box .user-box {
+  position: relative;
 }
 
-.input-field {
+.login-box .user-box input {
   width: 100%;
-  padding: 10px;
+  padding: 10px 0;
   font-size: 16px;
-  border: 1px solid #ccc;
+  color: #171616;
+  margin-bottom: 30px;
+  border: none;
+  border-bottom: 1px solid #171616;
+  outline: none;
+  background: transparent;
+}
+
+.login-box .user-box label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #171616;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.login-box .user-box input:focus ~ label,
+.login-box .user-box input:valid ~ label {
+  top: -20px;
+  left: 0;
+  color: #171616;
+  font-size: 12px;
+}
+
+.login-box form a {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  color: #171616;
+  font-size: 16px;
+  text-decoration: none;
+  overflow: hidden;
+  transition: 0.5s;
+  margin-top: 20px;
+  letter-spacing: 2px;
+}
+
+.login-box a:hover {
+  background: #3f76ed;
+  color: #fff !important;
   border-radius: 5px;
+}
+
+.login-box a span {
+  position: absolute;
+  display: block;
+}
+
+@keyframes btn-anim1 {
+  0% {
+    left: -100%;
+  }
+
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+
+.login-box a span:nth-child(1) {
+  bottom: 2px;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: #356eeb;
+  /* animation: btn-anim1 2s linear infinite; */
+  animation-delay: 3s;
 }
 
 .submit-button {
-  display: block;
-  width: 10rem;
-  padding: 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 30px;
-}
-
-.submit-button:hover {
-  background-color: #0056b3;
-}
-
-/* .general-container {
-  background-color: #d8dfe6;
-  padding: 10px;
   border-radius: 5px;
-  align-items: center;
+  border: 1px solid #356eeb;
+  color: #356eeb !important;
+}
+
+.container-centering {
+  display: flex;
   justify-content: center;
-} */
+}
