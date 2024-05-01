@@ -27,11 +27,12 @@ export const Input = ({ setSubmit }) => {
           <div className="user-box">
             <input
               type="password"
-              id="token"
+              id="Token"
               value={token}
               onChange={(e) => setToken(e.target.value)}
+              required
             />{" "}
-            <label>Personal Token</label>
+            <label>Personal Token (Optional)</label>
           </div>
           <center>
             <a onClick={handleSubmit} className="submit-button">

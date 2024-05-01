@@ -72,15 +72,12 @@
   display: block;
 }
 
-@keyframes btn-anim1 {
-  0% {
-    left: -100%;
-  }
+.login-box .user-box label:nth-child(1) {
+  animation-delay: 3s;
+}
 
-  50%,
-  100% {
-    left: 100%;
-  }
+.login-box .user-box label:nth-child(2) {
+  animation-delay: 3s;
 }
 
 .login-box a span:nth-child(1) {
