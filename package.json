@@ -4,13 +4,24 @@
   "description": "",
   "main": "githubAPI.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:frontend": "cd frontend/graph-app && npm run dev",
+    "start:backend": "node cachingService.js",
+    "start:docker": "docker-compose up",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"npm run start:docker\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.8",
-    "highcharts": "^11.4.1"
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "highcharts": "^11.4.1",
+    "mongodb": "^6.7.0",
+    "react-toastify": "^10.0.5"
+  },
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

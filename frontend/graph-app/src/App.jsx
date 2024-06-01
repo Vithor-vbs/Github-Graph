@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       <Input setSubmit={setSubmit} />
-      <GithubRepoGraph submitData={submitData} />
+      <GithubRepoGraph submitData={submitData} setSubmit={setSubmit} />
     </>
   );
 }
