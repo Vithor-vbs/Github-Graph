@@ -1,6 +1,6 @@
 import "./App.css";
-import GithubRepoGraph from "./GithubGraph";
-import { Input } from "./Input";
+import GithubRepoGraph from "../components/GithubGraph/GithubGraph";
+import { Input } from "../components/InputComponent/Input";
 import { useState } from "react";
 
 function App() {

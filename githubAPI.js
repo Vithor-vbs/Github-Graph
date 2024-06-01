@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 async function fetchRepoLanguages(username, repo, personalToken) {
   const url = `https://api.github.com/repos/${username}/${repo}/languages`;
@@ -80,6 +81,7 @@ export async function fetchReposDetails(username, personalToken) {
     }
   } catch (error) {
     console.error("Error fetching repos details:", error);
+    toast.error("Error fetching repos details. Please try again.");
     return [];
   }
 }

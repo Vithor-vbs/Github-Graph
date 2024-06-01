@@ -5,10 +5,12 @@ import HCExporting from "highcharts/modules/exporting";
 import HCExportData from "highcharts/modules/export-data";
 import HCAccessibility from "highcharts/modules/accessibility";
 
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { fetchReposDetails } from "../../../githubAPI";
+import { fetchReposDetails } from "../../../../../githubAPI";
+import { fetchCachedData, postToCache } from "./utils";
+import { ProximityUsersGraph } from "./ProximityUsersGraph/ProximityUsersGraph";
 
 HighchartsNetworkgraph(Highcharts);
 HCExporting(Highcharts);
@@ -20,17 +22,14 @@ const GithubRepoGraph = ({ submitData, setSubmit }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const cachedResponse = await fetch(
-          `http://localhost:5000/cache/${submitData.username}`
-        );
-        const cachedData = await cachedResponse.json();
-        if (cachedData) {
-          setReposData(cachedData);
-          console.log("Using cached data:", cachedData);
-          return;
-        }
+      const cachedData = await fetchCachedData(submitData.username);
+      if (cachedData) {
+        setReposData(cachedData);
+        console.log("Using cached data:", cachedData);
+        return;
+      }
 
+      if (submitData.username !== "") {
         const data = await fetchReposDetails(
           submitData.username,
           submitData.personalToken
@@ -38,25 +37,13 @@ const GithubRepoGraph = ({ submitData, setSubmit }) => {
         const filteredData = data.filter(
           (repo) => repo.name !== submitData.username
         );
-        await fetch("http://localhost:5000/cache", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: submitData.username,
-            filteredData,
-          }),
-        });
+
+        if (filteredData.length !== 0) {
+          await postToCache(submitData.username, filteredData);
+          console.log("Fetched and cached data:", filteredData);
+        }
 
         setReposData(filteredData);
-        console.log("Fetched and cached data:", filteredData);
-      } catch (error) {
-        if (error.response && error.response.status === 403) {
-          toast.error("API limit reached");
-        } else {
-          console.error("An error ocurred:", error);
-        }
       }
     };
     fetchData();
@@ -197,6 +184,10 @@ const GithubRepoGraph = ({ submitData, setSubmit }) => {
     <>
       <ToastContainer />
       <div id="container"></div>
+      <ProximityUsersGraph
+        reposData={reposData}
+        targetUser={submitData.username}
+      />
     </>
   );
 };
