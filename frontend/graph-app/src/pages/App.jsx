@@ -1,4 +1,3 @@
-import "./App.css";
 import GithubRepoGraph from "../components/GithubGraph/GithubGraph";
 import { Input } from "../components/InputComponent/Input";
 import { useState } from "react";
