@@ -1,4 +1,4 @@
-export async function fetchCachedData(username) {
+export async function fetchCachedData(username: string) {
   const response = await fetch(`http://localhost:5000/cache/${username}`);
   if (!response.ok) {
     console.error(`HTTP error:  ${response.status}`);
@@ -7,7 +7,7 @@ export async function fetchCachedData(username) {
   return data;
 }
 
-export async function postToCache(username, filteredData) {
+export async function postToCache(username: string, filteredData: any) {
   const response = await fetch("http://localhost:5000/cache", {
     method: "POST",
     headers: {
