@@ -10,6 +10,7 @@ import { fetchCachedData, postToCache } from "../utils";
 
 import "./styles.css";
 import { generateCentralityGraph } from "./CentralityGraph";
+import { generateCommunityGraph } from "./CommunityGraph";
 
 HighchartsNetworkgraph(Highcharts);
 HCExporting(Highcharts);
@@ -151,6 +152,14 @@ export const ProximityUsersGraph: React.FC<Props> = ({
   useEffect(() => {
     if (proximityData.length > 0) {
       generateCentralityGraph(proximityData, targetUser);
+      const cleanupCommunityGraph = generateCommunityGraph(
+        proximityData,
+        targetUser
+      );
+
+      return () => {
+        cleanupCommunityGraph();
+      };
     }
   }, [proximityData, targetUser]);
 
@@ -190,6 +199,7 @@ export const ProximityUsersGraph: React.FC<Props> = ({
             </tbody>
           </table>
           <div id="centrality-container"></div>
+          <div id="community-container"></div>
         </>
       )}
     </div>
