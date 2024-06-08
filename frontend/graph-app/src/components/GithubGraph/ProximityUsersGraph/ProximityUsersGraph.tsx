@@ -9,6 +9,7 @@ import { fetchReposDetails } from "../../../../../../githubAPI";
 import { fetchCachedData, postToCache } from "../utils";
 
 import "./styles.css";
+import { generateCentralityGraph } from "./CentralityGraph";
 
 HighchartsNetworkgraph(Highcharts);
 HCExporting(Highcharts);
@@ -21,7 +22,7 @@ interface RepoData {
   contributors: string[];
 }
 
-interface ProximityData {
+export interface ProximityData {
   contributor: string;
   language: string;
   userPercentage: number;
@@ -32,7 +33,6 @@ interface ProximityData {
 interface Props {
   reposData: RepoData[];
   targetUser: string;
-  personalToken: string;
 }
 
 const calculateLanguagePercentage = (
@@ -46,8 +46,7 @@ const calculateLanguagePercentage = (
 
 const extractLanguageData = async (
   reposData: RepoData[],
-  targetUser: string,
-  personalToken: string
+  targetUser: string
 ) => {
   const userLanguages: string[] = [];
   const contributorLanguages: { [key: string]: string[] } = {};
@@ -65,10 +64,7 @@ const extractLanguageData = async (
             (repo: RepoData) => repo.languages
           );
         } else {
-          const contributorRepos = await fetchReposDetails(
-            contributor,
-            personalToken
-          );
+          const contributorRepos = await fetchReposDetails(contributor);
           const contributorRepoLanguages = contributorRepos.flatMap(
             (repo) => repo.languages
           );
@@ -88,6 +84,7 @@ const calculateProximity = (
 ): ProximityData[] => {
   const proximityData: ProximityData[] = [];
   const similarityScores: { [key: string]: number } = {};
+  console.log(userLanguages, contributorLanguages);
 
   const uniqueUserLanguages = Array.from(new Set(userLanguages));
 
@@ -106,7 +103,8 @@ const calculateProximity = (
           languages,
           language
         );
-        const similarityScore = Math.min(userPercentage, contributorPercentage);
+        const similarityScore =
+          100 - Math.abs(userPercentage - contributorPercentage);
 
         totalSimilarityScore += similarityScore;
 
@@ -127,75 +125,13 @@ const calculateProximity = (
     (a, b) => similarityScores[b.contributor] - similarityScores[a.contributor]
   );
 
+  console.log(proximityData);
   return proximityData;
-};
-
-const generateGraphData = (
-  proximityData: ProximityData[],
-  targetUser: string
-) => {
-  const nodes = {};
-  const links: { from: string; to: string; value: number; color?: string }[] =
-    [];
-
-  // Add the targetUser as a central node
-  nodes[targetUser] = {
-    id: targetUser,
-    name: targetUser,
-    marker: {
-      radius: 25,
-    },
-    color: "#3366cc",
-  };
-
-  proximityData.forEach(({ contributor, language, similarityScore }) => {
-    if (!nodes[contributor]) {
-      nodes[contributor] = {
-        id: contributor,
-        name: contributor,
-        marker: {
-          radius: 15,
-        },
-        color: "#f7a35c",
-      };
-    }
-
-    if (!nodes[language]) {
-      nodes[language] = {
-        id: language,
-        name: language,
-        marker: {
-          radius: 10,
-        },
-        color: "#90ee7e",
-      };
-    }
-
-    links.push({
-      from: contributor,
-      to: language,
-      value: similarityScore,
-    });
-
-    // Create links between targetUser and contributors
-    links.push({
-      from: targetUser,
-      to: contributor,
-      value: 1,
-      color: "#3366cc",
-    });
-  });
-
-  return {
-    nodes: Object.values(nodes),
-    links,
-  };
 };
 
 export const ProximityUsersGraph: React.FC<Props> = ({
   reposData,
   targetUser,
-  personalToken,
 }) => {
   const [proximityData, setProximityData] = useState<ProximityData[]>([]);
 
@@ -203,105 +139,59 @@ export const ProximityUsersGraph: React.FC<Props> = ({
     const fetchData = async () => {
       const { userLanguages, contributorLanguages } = await extractLanguageData(
         reposData,
-        targetUser,
-        personalToken
+        targetUser
       );
       const proximity = calculateProximity(userLanguages, contributorLanguages);
       setProximityData(proximity);
     };
 
     fetchData();
-  }, [reposData, targetUser, personalToken]);
+  }, [reposData, targetUser]);
 
   useEffect(() => {
     if (proximityData.length > 0) {
-      const graphData = generateGraphData(proximityData, targetUser);
-
-      const chart = Highcharts.chart("proximity-container", {
-        chart: {
-          type: "networkgraph",
-          height: "800px",
-        },
-        title: {
-          text: "Language Proximity Graph",
-          align: "left",
-        },
-        subtitle: {
-          text: `Language Proximity for ${targetUser}`,
-          align: "left",
-        },
-        plotOptions: {
-          networkgraph: {
-            keys: ["from", "to"],
-            layoutAlgorithm: {
-              enableSimulation: true,
-              friction: -0.9,
-              repulsion: 1500,
-            },
-            dataLabels: {
-              enabled: true,
-              allowOverlap: true,
-              color: "black",
-              style: {
-                fontSize: "14px",
-                textOutline: "none",
-              },
-            },
-          },
-        },
-        series: [
-          {
-            accessibility: {
-              enabled: false,
-            },
-            id: "proximity-graph",
-            nodes: graphData.nodes,
-            data: graphData.links.map((link) => [link.from, link.to]),
-          },
-        ],
-      });
-
-      // Clean up
-      return () => {
-        chart.destroy();
-      };
+      generateCentralityGraph(proximityData, targetUser);
     }
   }, [proximityData, targetUser]);
 
   return (
     <div className="proximity-graph-container">
-      <h3>Language Proximity for {targetUser}</h3>
-      <table className="proximity-table">
-        <thead>
-          <tr>
-            <th>Contributor</th>
-            <th>Language</th>
-            <th>{targetUser} Percentage</th>
-            <th>Contributor Percentage</th>
-            <th>Similarity Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {proximityData.map(
-            ({
-              contributor,
-              language,
-              userPercentage,
-              contributorPercentage,
-              similarityScore,
-            }) => (
-              <tr key={`${contributor}-${language}`}>
-                <td>{contributor}</td>
-                <td>{language}</td>
-                <td>{userPercentage.toFixed(2)}%</td>
-                <td>{contributorPercentage.toFixed(2)}%</td>
-                <td>{similarityScore.toFixed(2)}</td>
+      {proximityData.length > 0 && (
+        <>
+          <h3>Language Proximity for {targetUser}</h3>
+          <table className="proximity-table">
+            <thead>
+              <tr>
+                <th>Contributor</th>
+                <th>Language</th>
+                <th>{targetUser} Percentage</th>
+                <th>Contributor Percentage</th>
+                <th>Similarity Score</th>
               </tr>
-            )
-          )}
-        </tbody>
-      </table>
-      <div id="proximity-container"></div>
+            </thead>
+            <tbody>
+              {proximityData.map(
+                ({
+                  contributor,
+                  language,
+                  userPercentage,
+                  contributorPercentage,
+                  similarityScore,
+                }) => (
+                  <tr key={`${contributor}-${language}`}>
+                    <td>{contributor}</td>
+                    <td>{language}</td>
+                    <td>{userPercentage.toFixed(2)}%</td>
+                    <td>{contributorPercentage.toFixed(2)}%</td>
+                    <td>{similarityScore.toFixed(2)}</td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+          <div id="centrality-container"></div>
+        </>
+      )}
     </div>
   );
 };
